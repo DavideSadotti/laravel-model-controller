@@ -17,9 +17,7 @@ class MovieController extends Controller
         $movies = Movie::all();
 
         
-        return view('movies.index', [
-            'movies' => $movies
-        ]);
+        return view('movies.index', ['movies' => $movies]);
     }
 
     /**
@@ -29,7 +27,7 @@ class MovieController extends Controller
      */
     public function create()
     {
-        //
+        return view('movies.create');
     }
 
     /**
@@ -40,7 +38,27 @@ class MovieController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $year = date('Y') + 1;
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'author' => 'required|string|max:50',
+            'genre' => 'required|string|max:50',
+            'plot' => 'required|string',
+            'year' => 'required|numeric|min:1900|max:'.$year,
+        ]);
+
+        $movieNew = Movie::create($request->all());
+
+        // $movieNew = new Movie();
+        // $movieNew->title = $data['title'];
+        // $movieNew->film_director = ['datafilm_director'];
+        // $movieNew->genres = $data['genres'];
+        // $movieNew->plot = $data['plot'];
+        // $movieNew->year = $data['year'];
+
+        // // if( !empty($data['cover_image']))
+
+        return redirect()->route('movies.show', $movieNew);
     }
 
     /**
@@ -60,9 +78,9 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Movie $movie)
     {
-        //
+        return view('movies.edit', ['movie' => $movie]);
     }
 
     /**
@@ -72,9 +90,20 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Movie $movie)
     {
-        //
+        $year = date('Y') + 1;
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'author' => 'required|string|max:50',
+            'genre' => 'required|string|max:50',
+            'plot' => 'required|string',
+            'year' => 'required|numeric|min:1900|max:'.$year,
+        ]);
+
+        $movie->update($request->all());
+
+        return redirect()->route('movies.show', $movie);
     }
 
     /**
@@ -83,8 +112,10 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Movie $movie)
     {
-        //
+        $movie->delete();
+
+        return redirect()->route('movies.index')->with('message', 'Il film è stato eliminato');
     }
 }
